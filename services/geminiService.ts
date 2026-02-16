@@ -1,11 +1,29 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ChatMessage, EvaluationResult, Question } from "../types";
 import { SYSTEM_INSTRUCTION } from "../constants";
+import { localStorageService } from "./localStorageService";
 
 const getAI = () => {
-  const options: any = { apiKey: process.env.API_KEY };
-  if (process.env.GEMINI_BASE_URL) {
-    options.httpOptions = { baseUrl: process.env.GEMINI_BASE_URL };
+  const prefs = localStorageService.loadPreferences();
+  let apiKey = prefs?.apiKey;
+  let baseUrl = prefs?.baseUrl;
+
+  // Fallback to env vars
+  if (!apiKey) {
+    apiKey = process.env.VITE_GEMINI_API_KEY || process.env.API_KEY;
+  }
+  
+  if (!baseUrl) {
+    baseUrl = process.env.GEMINI_BASE_URL;
+  }
+
+  if (!apiKey) {
+    throw new Error("API Key is missing. Please configure it in Settings.");
+  }
+
+  const options: any = { apiKey };
+  if (baseUrl) {
+    options.httpOptions = { baseUrl };
   }
   return new GoogleGenAI(options);
 };
@@ -16,7 +34,7 @@ export const sendChatMessage = async (
   modelName: string = "gemini-3-flash-preview"
 ): Promise<string> => {
   const ai = getAI();
-  
+
   // Filter out system messages and transform to Gemini format
   const validHistory = history.filter(msg => msg.role !== 'system');
   const historyParts = validHistory.map(msg => ({
@@ -41,10 +59,10 @@ export const sendCoachMessage = async (
   history: ChatMessage[],
   newMessage: string,
   reviewContext: { question: string, feedback: string, score: number },
-  modelName: string = "gemini-2.0-flash-exp"
+  modelName: string = "gemini-3-flash-preview"
 ): Promise<string> => {
   const ai = getAI();
-  
+
   // Filter out system messages and transform to Gemini format
   const validHistory = history.filter(msg => msg.role !== 'system');
   const historyParts = validHistory.map(msg => ({
@@ -94,7 +112,7 @@ export const evaluateSession = async (
   conversationHistory: ChatMessage[]
 ): Promise<EvaluationResult> => {
   const ai = getAI();
-  
+
   // Contextualize the evaluation
   const prompt = `
     Analyze the following conversation where I (the User) was tested on the question: "${question.question}".

@@ -1,12 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { sendCoachMessage, sendChatMessage } from '../geminiService';
 import { ChatMessage } from '../../types';
+import { localStorageService } from '../localStorageService';
+
+// Mock localStorageService
+vi.mock('../localStorageService', () => ({
+  localStorageService: {
+    loadPreferences: vi.fn()
+  }
+}));
 
 // Mock the GoogleGenAI SDK
 const mockSendMessage = vi.fn();
 const mockChatsCreate = vi.fn().mockReturnValue({
   sendMessage: mockSendMessage
 });
+const mockGenerateContent = vi.fn();
+
+// Spy on constructor
+const GoogleGenAIConstructorSpy = vi.fn();
 
 vi.mock('@google/genai', () => {
   return {
@@ -15,9 +27,11 @@ vi.mock('@google/genai', () => {
         create: mockChatsCreate
       };
       models = {
-        generateContent: vi.fn()
+        generateContent: mockGenerateContent
       };
-      constructor(options: any) {}
+      constructor(options: any) {
+        GoogleGenAIConstructorSpy(options);
+      }
     },
     Type: {
       OBJECT: 'OBJECT',
@@ -28,13 +42,58 @@ vi.mock('@google/genai', () => {
 });
 
 describe('geminiService', () => {
+  const originalEnv = process.env;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.API_KEY = 'test-api-key';
+    process.env = { ...originalEnv };
+    process.env.VITE_GEMINI_API_KEY = 'env-key';
   });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it('should use API key from localStorage if available', async () => {
+    // Explicitly set return value
+    const mockPrefs = { apiKey: 'local-key', baseUrl: '' };
+    (localStorageService.loadPreferences as any).mockReturnValue(mockPrefs);
+    mockSendMessage.mockResolvedValue({ text: 'Response' });
+
+    await sendChatMessage([], 'test');
+    
+    expect(localStorageService.loadPreferences).toHaveBeenCalled();
+    expect(GoogleGenAIConstructorSpy).toHaveBeenCalledWith(expect.objectContaining({
+      apiKey: 'local-key'
+    }));
+  });
+
+  it('should fallback to env var if localStorage has no key', async () => {
+    (localStorageService.loadPreferences as any).mockReturnValue(null);
+    process.env.VITE_GEMINI_API_KEY = 'env-key';
+    mockSendMessage.mockResolvedValue({ text: 'Response' });
+
+    await sendChatMessage([], 'test');
+
+    expect(GoogleGenAIConstructorSpy).toHaveBeenCalledWith(expect.objectContaining({
+      apiKey: 'env-key'
+    }));
+  });
+
+  it('should throw error if no API key found', async () => {
+    (localStorageService.loadPreferences as any).mockReturnValue(null);
+    delete process.env.VITE_GEMINI_API_KEY;
+    delete process.env.API_KEY; 
+
+    await expect(sendChatMessage([], 'test')).rejects.toThrow('API Key is missing');
+  });
+//...
 
   describe('sendCoachMessage', () => {
     it('should use the coach persona and include review context', async () => {
+      (localStorageService.loadPreferences as any).mockReturnValue({ apiKey: 'key' });
+      process.env.VITE_GEMINI_API_KEY = 'key'; 
+
       const history: ChatMessage[] = [
         { id: '1', role: 'model', text: 'Question' },
         { id: '2', role: 'user', text: 'Answer' }
@@ -66,6 +125,7 @@ describe('geminiService', () => {
     });
 
     it('should handle API errors gracefully', async () => {
+        (localStorageService.loadPreferences as any).mockReturnValue({ apiKey: 'key' });
         const history: ChatMessage[] = [];
         const reviewContext = { question: 'q', feedback: 'f', score: 1 };
         

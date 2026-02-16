@@ -24,33 +24,33 @@ export const ChatInterface: React.FC<Props> = ({ question, onComplete, onSkip, i
   useEffect(() => {
     // Only init if messages are empty (first load)
     if (messages.length === 0) {
-        setMessages([
-            {
-                id: 'init',
-                role: 'model',
-                text: `Давай обсудим этот вопрос: **${question.question}**\n\nЧто ты можешь рассказать об этом?`
-            }
-        ]);
+      setMessages([
+        {
+          id: 'init',
+          role: 'model',
+          text: `Давай обсудим этот вопрос: **${question.question}**\n\nЧто ты можешь рассказать об этом?`
+        }
+      ]);
     }
   }, [question]);
 
   // Inject Coach Message on transition to Post Review
   useEffect(() => {
     if (isPostReview && !hasInjectedCoachMessage.current) {
-        hasInjectedCoachMessage.current = true;
-        setMessages(prev => [
-            ...prev,
-            {
-                id: 'separator',
-                role: 'system',
-                text: '--- Интервью завершено. Режим коучинга ---'
-            },
-            {
-                id: `coach-${Date.now()}`,
-                role: 'model',
-                text: 'Интервью завершено. Изучите результаты слева. Если у вас есть вопросы по оценке или теме, задавайте их здесь — я объясню.'
-            }
-        ]);
+      hasInjectedCoachMessage.current = true;
+      setMessages(prev => [
+        ...prev,
+        {
+          id: 'separator',
+          role: 'system',
+          text: 'Интервью завершено - Режим обучения'
+        },
+        {
+          id: `coach-${Date.now()}`,
+          role: 'model',
+          text: 'Интервью завершено. Изучите результаты слева. Если у вас есть вопросы по оценке или теме, задавайте их здесь — я объясню.'
+        }
+      ]);
     }
   }, [isPostReview]);
 
@@ -77,28 +77,31 @@ export const ChatInterface: React.FC<Props> = ({ question, onComplete, onSkip, i
     try {
       let responseText = '';
       if (isPostReview && reviewResult) {
-          responseText = await sendCoachMessage(
-              messages, 
-              inputValue, 
-              {
-                  question: question.question,
-                  feedback: reviewResult.feedback,
-                  score: reviewResult.score
-              }
-          );
+        responseText = await sendCoachMessage(
+          messages,
+          inputValue,
+          {
+            question: question.question,
+            feedback: reviewResult.feedback,
+            score: reviewResult.score
+          }
+        );
       } else {
-          responseText = await sendChatMessage(messages, inputValue);
+        responseText = await sendChatMessage(messages, inputValue);
       }
-      
+
       const botMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'model',
         text: responseText
       };
       setMessages(prev => [...prev, botMsg]);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setMessages(prev => [...prev, { id: 'err', role: 'system', text: 'Ошибка сети. Попробуйте еще раз.' }]);
+      const errorMessage = error.message && error.message.includes('API Key') 
+        ? error.message 
+        : 'Ошибка сети. Попробуйте еще раз.';
+      setMessages(prev => [...prev, { id: 'err', role: 'system', text: errorMessage }]);
     } finally {
       setIsTyping(false);
     }
@@ -120,8 +123,8 @@ export const ChatInterface: React.FC<Props> = ({ question, onComplete, onSkip, i
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleSend();
+      e.preventDefault();
+      handleSend();
     }
   }
 
@@ -130,38 +133,37 @@ export const ChatInterface: React.FC<Props> = ({ question, onComplete, onSkip, i
       {/* Header */}
       <div className={`p-4 border-b flex justify-between items-center ${isPostReview ? 'bg-indigo-50' : 'bg-slate-50'}`}>
         <div>
-            <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                {isPostReview ? <><GraduationCap size={18} className="text-indigo-600"/> Коучинг</> : 'Интервью с ИИ'}
-            </h3>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                question.difficulty === 'База' ? 'bg-green-100 text-green-700' :
-                question.difficulty === 'Хардкор' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+          <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+            {isPostReview ? <><GraduationCap size={18} className="text-indigo-600" /> Коучинг</> : 'Интервью с ИИ'}
+          </h3>
+          <span className={`text-xs px-2 py-0.5 rounded-full ${question.difficulty === 'База' ? 'bg-green-100 text-green-700' :
+            question.difficulty === 'Хардкор' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
             }`}>
-                {question.difficulty}
-            </span>
+            {question.difficulty}
+          </span>
         </div>
         <div className="flex items-center gap-2">
-            {!isPostReview && (
-                <>
-                    <button 
-                        onClick={onSkip}
-                        disabled={isEvaluating}
-                        title="Пропустить вопрос"
-                        className="text-sm flex items-center gap-2 px-3 py-1.5 bg-white text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 transition-colors"
-                    >
-                        <SkipForward className="w-4 h-4" />
-                        <span className="hidden sm:inline">Пропустить</span>
-                    </button>
-                    <button 
-                        onClick={handleFinish}
-                        disabled={messages.length < 2 || isEvaluating}
-                        className="text-sm flex items-center gap-2 px-3 py-1.5 bg-secondary text-white rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors"
-                    >
-                        {isEvaluating ? <Loader2 className="w-4 h-4 animate-spin"/> : <CheckCircle className="w-4 h-4" />}
-                        Завершить
-                    </button>
-                </>
-            )}
+          {!isPostReview && (
+            <>
+              <button
+                onClick={onSkip}
+                disabled={isEvaluating}
+                title="Пропустить вопрос"
+                className="text-sm flex items-center gap-2 px-3 py-1.5 bg-white text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 transition-colors"
+              >
+                <SkipForward className="w-4 h-4" />
+                <span className="hidden sm:inline">Пропустить</span>
+              </button>
+              <button
+                onClick={handleFinish}
+                disabled={messages.length < 2 || isEvaluating}
+                className="text-sm flex items-center gap-2 px-3 py-1.5 bg-secondary text-white rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors"
+              >
+                {isEvaluating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                Завершить
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -169,85 +171,83 @@ export const ChatInterface: React.FC<Props> = ({ question, onComplete, onSkip, i
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
         {messages.map((msg) => (
           msg.id === 'separator' ? (
-             <div key={msg.id} className="flex items-center justify-center my-4">
-                <div className="h-px bg-slate-300 flex-1"></div>
-                <span className="px-3 text-xs font-medium text-slate-400 uppercase tracking-wider">{msg.text}</span>
-                <div className="h-px bg-slate-300 flex-1"></div>
-             </div>
+            <div key={msg.id} className="flex items-center justify-center my-4">
+              <div className="h-px bg-slate-300 flex-1"></div>
+              <span className="px-3 text-xs font-medium text-slate-400 uppercase tracking-wider">{msg.text}</span>
+              <div className="h-px bg-slate-300 flex-1"></div>
+            </div>
           ) : (
-          <div 
-            key={msg.id} 
-            className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-          >
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                msg.role === 'user' ? 'bg-blue-100 text-blue-600' : 
-                msg.role === 'system' ? 'bg-red-100 text-red-600' : 
-                (isPostReview && messages.indexOf(msg) > messages.findIndex(m => m.id === 'separator')) ? 'bg-indigo-100 text-indigo-600' : 'bg-purple-100 text-purple-600'
-            }`}>
-                {msg.role === 'user' ? <User size={16}/> : (isPostReview && messages.indexOf(msg) > messages.findIndex(m => m.id === 'separator')) ? <GraduationCap size={16}/> : <Bot size={16}/>}
-            </div>
-            
-            <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
-                msg.role === 'user' 
-                ? 'bg-blue-600 text-white rounded-tr-none' 
+            <div
+              key={msg.id}
+              className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.role === 'user' ? 'bg-blue-100 text-blue-600' :
+                msg.role === 'system' ? 'bg-red-100 text-red-600' :
+                  (isPostReview && messages.indexOf(msg) > messages.findIndex(m => m.id === 'separator')) ? 'bg-indigo-100 text-indigo-600' : 'bg-purple-100 text-purple-600'
+                }`}>
+                {msg.role === 'user' ? <User size={16} /> : (isPostReview && messages.indexOf(msg) > messages.findIndex(m => m.id === 'separator')) ? <GraduationCap size={16} /> : <Bot size={16} />}
+              </div>
+
+              <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${msg.role === 'user'
+                ? 'bg-blue-600 text-white rounded-tr-none'
                 : 'bg-white text-slate-700 border border-slate-200 rounded-tl-none'
-            }`}>
-              {msg.role === 'system' ? (
+                }`}>
+                {msg.role === 'system' ? (
                   <span className="text-red-500">{msg.text}</span>
-              ) : (
-                <div className={`markdown prose prose-sm max-w-none ${msg.role === 'user' ? 'prose-invert' : ''}`}>
-                    <ReactMarkdown 
-                        components={{
-                            p: ({node, ...props}) => <p className="mb-1 last:mb-0" {...props} />,
-                            ul: ({node, ...props}) => <ul className="list-disc ml-4 mb-2" {...props} />,
-                            ol: ({node, ...props}) => <ol className="list-decimal ml-4 mb-2" {...props} />
-                        }}
+                ) : (
+                  <div className={`markdown prose prose-sm max-w-none ${msg.role === 'user' ? 'prose-invert' : ''}`}>
+                    <ReactMarkdown
+                      components={{
+                        p: ({ node, ...props }) => <p className="mb-1 last:mb-0" {...props} />,
+                        ul: ({ node, ...props }) => <ul className="list-disc ml-4 mb-2" {...props} />,
+                        ol: ({ node, ...props }) => <ol className="list-decimal ml-4 mb-2" {...props} />
+                      }}
                     >
-                        {msg.text}
+                      {msg.text}
                     </ReactMarkdown>
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
           )
         ))}
         {isTyping && (
-           <div className="flex gap-3">
-             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isPostReview ? 'bg-indigo-100 text-indigo-600' : 'bg-purple-100 text-purple-600'}`}>
-               {isPostReview ? <GraduationCap size={16}/> : <Bot size={16}/>}
-             </div>
-             <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm flex items-center gap-1">
-                <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></span>
-                <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-75"></span>
-                <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-150"></span>
-             </div>
-           </div>
+          <div className="flex gap-3">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isPostReview ? 'bg-indigo-100 text-indigo-600' : 'bg-purple-100 text-purple-600'}`}>
+              {isPostReview ? <GraduationCap size={16} /> : <Bot size={16} />}
+            </div>
+            <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm flex items-center gap-1">
+              <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></span>
+              <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-75"></span>
+              <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-150"></span>
+            </div>
+          </div>
         )}
       </div>
 
       {/* Input */}
       <div className="p-4 bg-white border-t border-slate-200">
         <div className="relative flex items-center gap-2">
-            <textarea
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={isPostReview ? "Задайте вопрос коучу..." : "Ваш ответ..."}
-                className="w-full resize-none rounded-xl border border-slate-300 pl-4 pr-12 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none max-h-32"
-                rows={1}
-            />
-            <button 
-                onClick={handleSend}
-                disabled={!inputValue.trim() || isTyping || isEvaluating}
-                className="absolute right-2 p-2 bg-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-                <Send size={16} />
-            </button>
+          <textarea
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={isPostReview ? "Задайте вопрос коучу..." : "Ваш ответ..."}
+            className="w-full resize-none rounded-xl border border-slate-300 pl-4 pr-12 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none max-h-32"
+            rows={1}
+          />
+          <button
+            onClick={handleSend}
+            disabled={!inputValue.trim() || isTyping || isEvaluating}
+            className="absolute right-2 p-2 bg-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <Send size={16} />
+          </button>
         </div>
         {!isPostReview && (
-            <p className="text-xs text-slate-400 mt-2 text-center">
-                ИИ задает наводящие вопросы. Нажмите "Завершить", когда будете готовы получить оценку.
-            </p>
+          <p className="text-xs text-slate-400 mt-2 text-center">
+            ИИ задает наводящие вопросы. Нажмите "Завершить", когда будете готовы получить оценку.
+          </p>
         )}
       </div>
     </div>
