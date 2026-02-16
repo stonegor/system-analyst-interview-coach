@@ -1,0 +1,5 @@
+{
+  "name": "System Analyst Interview Coach",
+  "description": "An intelligent spaced-repetition application for mastering System Analysis interview questions using Socratic dialogue with Gemini AI.",
+  "requestFramePermissions": []
+}

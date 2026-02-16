@@ -1,0 +1,8 @@
+{
+  "track_id": "manual_rating_override_20260216",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-16T00:00:00Z",
+  "updated_at": "2026-02-16T00:00:00Z",
+  "description": "Allow the user to manually override AI rating with your rating."
+}
