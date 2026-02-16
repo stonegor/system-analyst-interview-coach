@@ -70,7 +70,7 @@ const EditRatingControl: React.FC<Props> = ({ initialRating, onSave, children })
             {children || <span className="text-lg font-bold">{initialRating}</span>}
             <button
                 onClick={() => setIsEditing(true)}
-                className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 p-1.5 bg-white text-slate-400 hover:text-primary hover:bg-blue-50 border border-slate-200 rounded-full shadow-sm transition-all z-10"
+                className="absolute -top-2 -right-2 md:opacity-0 md:group-hover:opacity-100 opacity-100 p-1.5 bg-white text-slate-400 hover:text-primary hover:bg-blue-50 border border-slate-200 rounded-full shadow-sm transition-all z-10"
                 aria-label="Edit rating"
             >
                 <Pencil className="w-3 h-3" />

@@ -16,6 +16,8 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [result, setResult] = useState<EvaluationResult | null>(null);
 
+  const [hasBeenEdited, setHasBeenEdited] = useState(false);
+
   useEffect(() => {
     if (initialQuestion) {
         setQueue([initialQuestion]);
@@ -35,11 +37,13 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
     if (currentQuestion) {
         saveProgress(currentQuestion.id, evalResult.score);
         setResult(evalResult);
+        setHasBeenEdited(false);
     }
   };
 
   const nextQuestion = () => {
     setResult(null);
+    setHasBeenEdited(false);
     if (!isLastQuestion) {
         setCurrentIndex(prev => prev + 1);
     } else {
@@ -64,6 +68,7 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
       if (result && currentQuestion) {
           updateLastRating(currentQuestion.id, newRating);
           setResult({ ...result, score: newRating as 1 | 2 | 3 });
+          setHasBeenEdited(true);
       }
   };
 
@@ -105,9 +110,12 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
                             <Star className={`w-5 h-5 ${result.score >= 1 ? 'fill-current' : 'opacity-30'}`} />
                             <Star className={`w-5 h-5 ${result.score >= 2 ? 'fill-current' : 'opacity-30'}`} />
                             <Star className={`w-5 h-5 ${result.score >= 3 ? 'fill-current' : 'opacity-30'}`} />
-                            <span className="font-bold ml-auto text-lg">
-                                {result.score === 3 ? 'Отлично' : result.score === 2 ? 'Хорошо' : 'Надо учить'}
-                            </span>
+                            <div className="ml-auto flex flex-col items-end">
+                                <span className="font-bold text-lg">
+                                    {result.score === 3 ? 'Отлично' : result.score === 2 ? 'Хорошо' : 'Надо учить'}
+                                </span>
+                                {hasBeenEdited && <span className="text-[10px] text-slate-400 font-normal">изменено</span>}
+                            </div>
                         </div>
                     </div>
                 </EditRatingControl>

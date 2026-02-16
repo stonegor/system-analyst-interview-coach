@@ -15,9 +15,10 @@ vi.mock('../ChatInterface', () => ({
 }));
 
 vi.mock('../EditRatingControl', () => ({
-  default: ({ initialRating, onSave }) => (
+  default: ({ initialRating, onSave, children }) => (
     <div data-testid="edit-rating-control">
-      <span>Rating: {initialRating}</span>
+      {children}
+      <div data-testid="mock-rating-display">Rating: {initialRating}</div>
       <button onClick={() => onSave(3)}>Update Rating</button>
     </div>
   ),
@@ -92,5 +93,6 @@ describe('Session', () => {
     });
     
     expect(storageService.updateLastRating).toHaveBeenCalledWith(1, 3);
+    expect(screen.getByText(/изменено/i)).toBeInTheDocument();
   });
 });
