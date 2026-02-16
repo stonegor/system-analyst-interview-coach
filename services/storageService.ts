@@ -61,6 +61,67 @@ export const saveProgress = (questionId: number, score: 1 | 2 | 3) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(allProgress));
 };
 
+export const updateLastRating = (questionId: number, newRating: number) => {
+  const allProgress = getProgress();
+  const current = allProgress[questionId];
+
+  if (!current || current.history.length === 0) {
+    return;
+  }
+
+  const history = [...current.history];
+  const lastEntry = history[history.length - 1];
+  const oldScore = lastEntry.score;
+
+  // 1. Reverse-engineer the previous box
+  let prevBox = current.box;
+  if (oldScore === 3) {
+      prevBox = Math.max(0, current.box - 1);
+  } else if (oldScore === 2) {
+      prevBox = current.box;
+  } else {
+      // oldScore === 1. Box was reset to 1. 
+      // We don't know what it was before. We assume it was 1 for safety.
+      // If the user got 1, they likely didn't know it well, so 1 is a fair baseline.
+      prevBox = current.box; 
+  }
+
+  // 2. Calculate new box and interval with new rating
+  let newBox = prevBox;
+  let intervalMs = 0;
+
+  if (newRating === 1) {
+    newBox = 1;
+    intervalMs = 10 * 60 * 1000; // 10 mins
+  } else if (newRating === 2) {
+    // Keep box same
+    newBox = prevBox; // Use prevBox, not current.box
+    intervalMs = 24 * 60 * 60 * 1000;
+  } else {
+    // Score 3
+    newBox = Math.min(prevBox + 1, 6);
+    const days = Math.pow(2, newBox - 1); 
+    intervalMs = days * 24 * 60 * 60 * 1000;
+  }
+
+  // 3. Update history
+  lastEntry.score = newRating as 1 | 2 | 3; // Update in place (reference)
+
+  const updated: UserProgress = {
+    ...current,
+    box: newBox,
+    // We update lastReviewed to now (or keep it as is? keeping it as is since it's the same session)
+    // Actually, if we change rating, the "next review" is calculated from "last reviewed".
+    // So we should probably keep `lastReviewed` unless we want to reset the clock.
+    // Let's keep `lastReviewed` as is.
+    nextReview: current.lastReviewed + intervalMs,
+    history: history
+  };
+
+  allProgress[questionId] = updated;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(allProgress));
+};
+
 export const skipQuestion = (questionId: number) => {
   const allProgress = getProgress();
   const current = allProgress[questionId] || {
