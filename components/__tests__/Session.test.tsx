@@ -54,6 +54,7 @@ describe('Session', () => {
     vi.spyOn(storageService, 'getSmartQueue').mockReturnValue([mockQuestion]);
     vi.spyOn(storageService, 'saveProgress').mockImplementation(() => {});
     vi.spyOn(storageService, 'skipQuestion').mockImplementation(() => {});
+    vi.spyOn(storageService, 'updateLastRating').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -87,12 +88,9 @@ describe('Session', () => {
 
     await waitFor(() => {
         // Since we are mocking EditRatingControl, we check if the prop passed to it would update
-        // But wait, the Session component needs to update its state 'result' when onSave is called.
-        // The mock calls onSave(3).
-        // We expect the session to re-render with the new rating.
-        // However, since we are mocking the child, we can't easily see the prop change unless we inspect the mock calls or the rendered output if it reflects props.
-        // The mock renders `Rating: {initialRating}`. So if Session updates state, `initialRating` prop changes, and the text changes.
         expect(screen.getByText('Rating: 3')).toBeInTheDocument();
     });
+    
+    expect(storageService.updateLastRating).toHaveBeenCalledWith(1, 3);
   });
 });

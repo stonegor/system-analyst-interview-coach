@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Star, BookOpen, ExternalLink, RefreshCw } from 'lucide-react';
-import { getSmartQueue, saveProgress, skipQuestion } from '../services/storageService';
+import { getSmartQueue, saveProgress, skipQuestion, updateLastRating } from '../services/storageService';
 import { Question, EvaluationResult } from '../types';
 import { ChatInterface } from './ChatInterface';
 import ReactMarkdown from 'react-markdown';
@@ -61,9 +61,9 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
   };
 
   const handleRatingUpdate = (newRating: number) => {
-      if (result) {
+      if (result && currentQuestion) {
+          updateLastRating(currentQuestion.id, newRating);
           setResult({ ...result, score: newRating as 1 | 2 | 3 });
-          // Note: Persistence will be handled in Phase 2
       }
   };
 
