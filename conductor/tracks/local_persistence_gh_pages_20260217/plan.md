@@ -11,7 +11,7 @@ Goal: Implement a robust local storage service to handle user preferences and qu
     - [ ] Test saving/loading valid data.
     - [ ] Test handling of missing/corrupt data (schema validation).
     - [ ] Test export/import logic (ensure API keys are NOT exported).
-- [ ] Task: Integrate Storage Service into App Context
+- [x] Task: Integrate Storage Service into App Context c584581
     - [ ] Update `App.tsx` or a new `StorageContext` to initialize state from local storage on boot.
 - [ ] Task: Conductor - User Manual Verification 'Storage Service Refactoring' (Protocol in workflow.md)
 
