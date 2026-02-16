@@ -183,18 +183,14 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
 
       {/* Chat Area */}
       <div className="flex-1 h-[60vh] md:h-full md:rounded-2xl overflow-hidden shadow-xl">
-        {result ? (
-            <div className="h-full bg-slate-100 flex items-center justify-center p-8 text-center text-slate-500">
-                Чат завершен. Изучите результаты слева.
-            </div>
-        ) : (
-            <ChatInterface 
-                key={currentQuestion.id} 
-                question={currentQuestion} 
-                onComplete={handleComplete}
-                onSkip={handleSkip} 
-            />
-        )}
+        <ChatInterface 
+            key={currentQuestion.id} 
+            question={currentQuestion} 
+            onComplete={handleComplete}
+            onSkip={handleSkip} 
+            isPostReview={!!result}
+            reviewResult={result || undefined}
+        />
       </div>
     </div>
   );

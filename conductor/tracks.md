@@ -9,5 +9,5 @@ This file tracks all feature, bug fix, and chore tracks for the project.
 
 ---
 
-- [ ] **Track: Allow the user to ask clarification questions AFTER the review.**
+- [x] **Track: Allow the user to ask clarification questions AFTER the review.**
 *Link: [./tracks/clarification_questions_20260217/](./tracks/clarification_questions_20260217/)*

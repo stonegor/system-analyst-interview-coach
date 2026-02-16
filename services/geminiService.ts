@@ -37,6 +37,58 @@ export const sendChatMessage = async (
   return result.text || "Извините, произошла ошибка при генерации ответа.";
 };
 
+export const sendCoachMessage = async (
+  history: ChatMessage[],
+  newMessage: string,
+  reviewContext: { question: string, feedback: string, score: number },
+  modelName: string = "gemini-2.0-flash-exp"
+): Promise<string> => {
+  const ai = getAI();
+  
+  // Filter out system messages and transform to Gemini format
+  const validHistory = history.filter(msg => msg.role !== 'system');
+  const historyParts = validHistory.map(msg => ({
+    role: msg.role === 'model' ? 'model' : 'user',
+    parts: [{ text: msg.text }]
+  }));
+
+  const coachInstruction = `
+    You are a helpful and supportive System Analyst Interview Coach.
+    The formal interview session has ended. Your role now is to help the user understand their performance and learn from their mistakes.
+    
+    Context:
+    - The user was asked: "${reviewContext.question}"
+    - They received a score of: ${reviewContext.score}/3
+    - The feedback provided was: "${reviewContext.feedback}"
+    
+    Guidelines:
+    - Answer the user's questions clearly and concisely.
+    - Explain concepts if they are confused.
+    - Reference the specific feedback given if relevant.
+    - Maintain a positive, encouraging tone.
+    - Do NOT continue the roleplay as an interviewer. Be a mentor/teacher now.
+    - If the user asks about the score, explain why they received it based on the feedback, but remind them the score is final for this session.
+    - Respond in Russian.
+  `;
+
+  const chat = ai.chats.create({
+    model: modelName,
+    config: {
+      systemInstruction: coachInstruction,
+      temperature: 0.7,
+    },
+    history: historyParts
+  });
+
+  try {
+    const result = await chat.sendMessage({ message: newMessage });
+    return result.text || "Извините, произошла ошибка при генерации ответа.";
+  } catch (error) {
+    console.error("Coach message error:", error);
+    return "Извините, произошла ошибка при генерации ответа.";
+  }
+};
+
 export const evaluateSession = async (
   question: Question,
   conversationHistory: ChatMessage[]
