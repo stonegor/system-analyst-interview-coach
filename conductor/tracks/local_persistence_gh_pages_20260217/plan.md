@@ -36,7 +36,7 @@ Goal: Configure the project for hosting on GitHub Pages.
 
 - [x] Task: Update Vite Configuration f55bb06
     - [ ] Modify `vite.config.ts` to set the `base` path correctly (likely `./` or the repo name) for GitHub Pages.
-- [ ] Task: Create GitHub Actions Workflow
+- [x] Task: Create GitHub Actions Workflow d4f00a9
     - [ ] Create `.github/workflows/deploy.yml`.
     - [ ] Configure the workflow to install dependencies, build the project, and deploy the `dist` folder to the `gh-pages` branch on push to `main`.
 - [ ] Task: Documentation
