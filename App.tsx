@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dashboard } from './components/Dashboard';
 import { Session } from './components/Session';
 import { TopicDetails } from './components/TopicDetails';
 import { Category, Question } from './types';
+import { useStorage } from './contexts/StorageContext';
+import { SettingsModal } from './components/SettingsModal';
 
 enum View {
   DASHBOARD,
@@ -11,9 +13,18 @@ enum View {
 }
 
 const App: React.FC = () => {
+  const { preferences, isLoading } = useStorage();
   const [view, setView] = useState<View>(View.DASHBOARD);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Automatically open settings if no API key is found
+  useEffect(() => {
+    if (!isLoading && (!preferences || !preferences.apiKey)) {
+      setIsSettingsOpen(true);
+    }
+  }, [isLoading, preferences]);
 
   const handleStartSmartSession = () => {
     setSelectedQuestion(null);
@@ -48,11 +59,12 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="h-full bg-slate-50 font-sans antialiased text-slate-900">
+    <div className="h-full bg-slate-50 font-sans antialiased text-slate-900 relative">
       {view === View.DASHBOARD && (
         <Dashboard 
           onStart={handleStartSmartSession} 
           onSelectCategory={handleSelectCategory} 
+          onOpenSettings={() => setIsSettingsOpen(true)}
         />
       )}
       
@@ -70,6 +82,8 @@ const App: React.FC = () => {
           initialQuestion={selectedQuestion}
         />
       )}
+
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };

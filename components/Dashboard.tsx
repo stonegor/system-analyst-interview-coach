@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Brain, List, Trophy, ChevronRight } from 'lucide-react';
+import { Play, Brain, List, Trophy, ChevronRight, Settings } from 'lucide-react';
 import { INITIAL_DATA } from '../constants';
 import { Stats } from './Stats';
 import { Category } from '../types';
@@ -7,14 +7,22 @@ import { Category } from '../types';
 interface Props {
   onStart: () => void;
   onSelectCategory: (category: Category) => void;
+  onOpenSettings: () => void;
 }
 
-export const Dashboard: React.FC<Props> = ({ onStart, onSelectCategory }) => {
+export const Dashboard: React.FC<Props> = ({ onStart, onSelectCategory, onOpenSettings }) => {
   const { app_metadata, categories } = INITIAL_DATA;
 
   return (
     <div className="max-w-4xl mx-auto p-6 h-full overflow-y-auto">
-      <header className="mb-8 mt-4">
+      <header className="mb-8 mt-4 relative">
+        <button 
+          onClick={onOpenSettings}
+          className="absolute top-0 right-0 p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-full hover:bg-slate-100"
+          title="Настройки"
+        >
+          <Settings size={24} />
+        </button>
         <div className="inline-flex items-center justify-center p-3 bg-blue-100 text-blue-600 rounded-xl mb-4">
             <Brain size={32} />
         </div>
