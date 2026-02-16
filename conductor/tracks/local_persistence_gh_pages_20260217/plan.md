@@ -3,11 +3,11 @@
 ## Phase 1: Storage Service Refactoring
 Goal: Implement a robust local storage service to handle user preferences and question progress, replacing any temporary or mock storage.
 
-- [ ] Task: Create `services/localStorageService.ts`
+- [x] Task: Create `services/localStorageService.ts` 59a8702
     - [ ] Define TypeScript interfaces for `QuestionProgress` (id, status, lastAttempted, etc.) and `UserPreferences` (apiKey, baseUrl).
     - [ ] Implement methods to `saveProgress`, `loadProgress`, `savePreferences`, `loadPreferences`.
     - [ ] Implement `exportData` (returns JSON string) and `importData` (parses JSON string and validates schema).
-- [ ] Task: Write Unit Tests for Storage Service
+- [x] Task: Write Unit Tests for Storage Service 59a8702
     - [ ] Test saving/loading valid data.
     - [ ] Test handling of missing/corrupt data (schema validation).
     - [ ] Test export/import logic (ensure API keys are NOT exported).
