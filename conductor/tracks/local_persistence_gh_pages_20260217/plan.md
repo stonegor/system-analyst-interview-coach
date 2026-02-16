@@ -39,7 +39,7 @@ Goal: Configure the project for hosting on GitHub Pages.
 - [x] Task: Create GitHub Actions Workflow d4f00a9
     - [ ] Create `.github/workflows/deploy.yml`.
     - [ ] Configure the workflow to install dependencies, build the project, and deploy the `dist` folder to the `gh-pages` branch on push to `main`.
-- [ ] Task: Documentation
+- [x] Task: Documentation ba2ad84
     - [ ] Update `README.md` with instructions on how to generate a Gemini API key and use the "Bring Your Own Key" feature.
 - [ ] Task: Conductor - User Manual Verification 'GitHub Pages Deployment' (Protocol in workflow.md)
 
