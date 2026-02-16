@@ -26,7 +26,7 @@ Goal: Create the user interface for inputting API keys and managing data export/
 - [x] Task: Update Main Layout a6c5b85
     - [ ] Add a "Settings" gear icon/button to the main header to open the modal.
     - [ ] Add a check on app load: If no API key is found in storage/context, automatically open the Settings modal with a prompt.
-- [ ] Task: Verify API Key Usage
+- [x] Task: Verify API Key Usage 086cb09
     - [ ] Update `services/geminiService.ts` to accept an API key and Base URL dynamically (constructor or method injection) instead of hardcoded env vars.
     - [ ] Ensure the service throws a clear error if the key is missing or invalid, prompting the UI to show the settings modal.
 - [ ] Task: Conductor - User Manual Verification 'Settings & API Key Management UI' (Protocol in workflow.md)
