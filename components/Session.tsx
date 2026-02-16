@@ -94,7 +94,7 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
   return (
     <div className="h-full flex flex-col md:flex-row max-w-6xl mx-auto w-full md:p-6 p-0 gap-6">
       {/* Sidebar / Question Info */}
-      <div className="md:w-1/3 w-full bg-slate-50 md:rounded-2xl p-6 flex flex-col border-b md:border-r border-slate-200 md:h-full shrink-0 overflow-y-auto transition-all duration-300">
+      <div className="md:w-1/3 w-full bg-slate-50 md:rounded-2xl p-6 flex flex-col border-b md:border-r border-slate-200 md:h-full flex-1 min-h-0 md:shrink-0 overflow-y-auto transition-all duration-300">
         <button onClick={onExit} className="mb-6 flex items-center text-slate-500 hover:text-slate-800 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" /> Меню
         </button>
@@ -202,7 +202,7 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 h-[60vh] md:h-full md:rounded-2xl overflow-hidden shadow-xl">
+      <div className="flex-none md:flex-1 h-[60vh] md:h-full md:rounded-2xl overflow-hidden shadow-xl">
         <ChatInterface 
             key={currentQuestion.id} 
             question={currentQuestion} 
