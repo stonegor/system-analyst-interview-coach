@@ -23,7 +23,7 @@ Goal: Create the user interface for inputting API keys and managing data export/
     - [ ] Implement "API Key" form with validation and "Remember Me" checkbox.
     - [ ] Implement "Export" section with "Download JSON" and "Copy to Clipboard" buttons.
     - [ ] Implement "Import" section with "Upload JSON" and "Paste JSON" text area.
-- [ ] Task: Update Main Layout
+- [x] Task: Update Main Layout a6c5b85
     - [ ] Add a "Settings" gear icon/button to the main header to open the modal.
     - [ ] Add a check on app load: If no API key is found in storage/context, automatically open the Settings modal with a prompt.
 - [ ] Task: Verify API Key Usage
