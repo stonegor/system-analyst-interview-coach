@@ -15,7 +15,7 @@ Goal: Implement a robust local storage service to handle user preferences and qu
     - [ ] Update `App.tsx` or a new `StorageContext` to initialize state from local storage on boot.
 - [x] Task: Conductor - User Manual Verification 'Storage Service Refactoring' (Protocol in workflow.md)
 
-## Phase 2: Settings & API Key Management UI
+## Phase 2: Settings & API Key Management UI [checkpoint: e51291c]
 Goal: Create the user interface for inputting API keys and managing data export/import.
 
 - [x] Task: Create `components/SettingsModal.tsx` 0db61b4
