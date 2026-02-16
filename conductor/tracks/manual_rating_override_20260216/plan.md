@@ -1,13 +1,13 @@
 # Implementation Plan - Track: Manual Rating Override
 
 ## Phase 1: Frontend - UI Components & State Management
-- [~] Task: Create `EditRatingControl` component
+- [x] Task: Create `EditRatingControl` component [b04048c]
     - [ ] Create a new component `components/EditRatingControl.tsx` that accepts `initialRating` and `onSave` props.
     - [ ] Implement toggle state for view/edit mode.
     - [ ] In edit mode, render an input field (number) and Save/Cancel buttons.
     - [ ] Add validation to ensure input is within 0-100 range (or 1-5 based on existing system).
     - [ ] Display an error message for invalid input.
-- [ ] Task: Integrate `EditRatingControl` into `Session` and `TopicDetails` components
+- [~] Task: Integrate `EditRatingControl` into `Session` and `TopicDetails` components
     - [ ] Locate where the rating is currently displayed in `components/Session.tsx`.
     - [ ] Replace the static rating display with `EditRatingControl`.
     - [ ] Locate where the rating is currently displayed in `components/TopicDetails.tsx` (if applicable for historical view).

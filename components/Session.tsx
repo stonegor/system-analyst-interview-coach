@@ -4,6 +4,7 @@ import { getSmartQueue, saveProgress, skipQuestion } from '../services/storageSe
 import { Question, EvaluationResult } from '../types';
 import { ChatInterface } from './ChatInterface';
 import ReactMarkdown from 'react-markdown';
+import EditRatingControl from './EditRatingControl';
 
 interface Props {
   onExit: () => void;
@@ -59,6 +60,13 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
       }
   };
 
+  const handleRatingUpdate = (newRating: number) => {
+      if (result) {
+          setResult({ ...result, score: newRating as 1 | 2 | 3 });
+          // Note: Persistence will be handled in Phase 2
+      }
+  };
+
   if (!currentQuestion) {
     return (
         <div className="flex flex-col items-center justify-center h-full p-6 text-center">
@@ -88,21 +96,24 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
         {/* Evaluation Result View */}
         {result ? (
             <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className={`p-4 rounded-xl border mb-4 ${
-                    result.score === 3 ? 'bg-green-50 border-green-200' :
-                    result.score === 2 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'
-                }`}>
-                    <div className="flex items-center gap-2 mb-2">
-                        <Star className={`w-5 h-5 ${result.score >= 1 ? 'fill-current' : 'opacity-30'}`} />
-                        <Star className={`w-5 h-5 ${result.score >= 2 ? 'fill-current' : 'opacity-30'}`} />
-                        <Star className={`w-5 h-5 ${result.score >= 3 ? 'fill-current' : 'opacity-30'}`} />
-                        <span className="font-bold ml-auto text-lg">
-                            {result.score === 3 ? 'Отлично' : result.score === 2 ? 'Хорошо' : 'Надо учить'}
-                        </span>
+                <EditRatingControl initialRating={result.score} onSave={handleRatingUpdate}>
+                    <div className={`p-4 rounded-xl border mb-4 ${
+                        result.score === 3 ? 'bg-green-50 border-green-200' :
+                        result.score === 2 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'
+                    }`}>
+                        <div className="flex items-center gap-2 mb-2">
+                            <Star className={`w-5 h-5 ${result.score >= 1 ? 'fill-current' : 'opacity-30'}`} />
+                            <Star className={`w-5 h-5 ${result.score >= 2 ? 'fill-current' : 'opacity-30'}`} />
+                            <Star className={`w-5 h-5 ${result.score >= 3 ? 'fill-current' : 'opacity-30'}`} />
+                            <span className="font-bold ml-auto text-lg">
+                                {result.score === 3 ? 'Отлично' : result.score === 2 ? 'Хорошо' : 'Надо учить'}
+                            </span>
+                        </div>
                     </div>
-                </div>
+                </EditRatingControl>
 
                 <div className="prose prose-sm mb-6">
+
                     <h3 className="text-slate-900 font-semibold">Обратная связь:</h3>
                     <p>{result.feedback}</p>
                     

@@ -4,9 +4,10 @@ import { Pencil, Save, X } from 'lucide-react';
 interface Props {
     initialRating: number;
     onSave: (rating: number) => void;
+    children?: React.ReactNode;
 }
 
-const EditRatingControl: React.FC<Props> = ({ initialRating, onSave }) => {
+const EditRatingControl: React.FC<Props> = ({ initialRating, onSave, children }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [rating, setRating] = useState(initialRating);
     const [error, setError] = useState<string | null>(null);
@@ -33,13 +34,14 @@ const EditRatingControl: React.FC<Props> = ({ initialRating, onSave }) => {
 
     if (isEditing) {
         return (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 p-2 border rounded-xl bg-white shadow-sm">
                 <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-slate-700">Изменить оценку:</span>
                     <input
                         type="number"
                         value={rating}
                         onChange={(e) => setRating(Number(e.target.value))}
-                        className="w-20 p-2 border rounded-md"
+                        className="w-16 p-2 border rounded-md text-center"
                         min={1}
                         max={3}
                     />
@@ -64,14 +66,14 @@ const EditRatingControl: React.FC<Props> = ({ initialRating, onSave }) => {
     }
 
     return (
-        <div className="flex items-center gap-2 group">
-            <span className="text-lg font-bold">{initialRating}</span>
+        <div className="relative group">
+            {children || <span className="text-lg font-bold">{initialRating}</span>}
             <button
                 onClick={() => setIsEditing(true)}
-                className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-slate-600 transition-all"
+                className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 p-1.5 bg-white text-slate-400 hover:text-primary hover:bg-blue-50 border border-slate-200 rounded-full shadow-sm transition-all z-10"
                 aria-label="Edit rating"
             >
-                <Pencil className="w-4 h-4" />
+                <Pencil className="w-3 h-3" />
             </button>
         </div>
     );

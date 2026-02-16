@@ -10,7 +10,18 @@ describe('EditRatingControl', () => {
         mockOnSave.mockClear();
     });
 
-    it('renders initial rating in view mode', () => {
+    it('renders children when provided', () => {
+        render(
+            <EditRatingControl initialRating={2} onSave={mockOnSave}>
+                <div data-testid="child-content">Child Content</div>
+            </EditRatingControl>
+        );
+        expect(screen.getByTestId('child-content')).toBeInTheDocument();
+        expect(screen.queryByText('2')).not.toBeInTheDocument(); // Should not render default text if children provided
+        expect(screen.getByRole('button', { name: /edit rating/i })).toBeInTheDocument();
+    });
+
+    it('renders initial rating in view mode (default)', () => {
         render(<EditRatingControl initialRating={2} onSave={mockOnSave} />);
         expect(screen.getByText('2')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /edit rating/i })).toBeInTheDocument();
