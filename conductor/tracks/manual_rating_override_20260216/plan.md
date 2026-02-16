@@ -1,7 +1,7 @@
 # Implementation Plan - Track: Manual Rating Override
 
 ## Phase 1: Frontend - UI Components & State Management
-- [ ] Task: Create `EditRatingControl` component
+- [~] Task: Create `EditRatingControl` component
     - [ ] Create a new component `components/EditRatingControl.tsx` that accepts `initialRating` and `onSave` props.
     - [ ] Implement toggle state for view/edit mode.
     - [ ] In edit mode, render an input field (number) and Save/Cancel buttons.

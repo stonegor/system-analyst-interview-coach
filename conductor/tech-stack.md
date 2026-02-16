@@ -14,6 +14,6 @@
 - **AI Integration:** Google GenAI SDK (`@google/genai`)
 - **State Management:** React Context / Hooks (Inferred from component structure)
 
-## 4. Development Tools
-- **Linter/Formatter:** ESLint (Inferred standard for Vite/React)
-- **Package Manager:** npm (Inferred from usage instructions)
+## 5. Testing
+- **Test Runner:** Vitest
+- **Testing Utilities:** React Testing Library, jsdom
