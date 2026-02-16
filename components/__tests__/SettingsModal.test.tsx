@@ -78,6 +78,10 @@ describe('SettingsModal', () => {
     
     fireEvent.click(copyButton);
     
+    await waitFor(() => {
+      expect(screen.getByText('Copied!')).toBeInTheDocument();
+    });
+
     expect(mockExportData).toHaveBeenCalled();
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('{"test": "data"}');
   });

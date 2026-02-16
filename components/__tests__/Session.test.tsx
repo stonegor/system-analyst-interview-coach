@@ -25,6 +25,8 @@ vi.mock('lucide-react', () => ({
   Pencil: () => <span>Pencil</span>,
   Save: () => <span>Save</span>,
   X: () => <span>X</span>,
+  ChevronUp: () => <span>ChevronUp</span>,
+  ChevronDown: () => <span>ChevronDown</span>,
 }));
 
 // Mock ReactMarkdown
