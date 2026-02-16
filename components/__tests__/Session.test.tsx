@@ -14,20 +14,10 @@ vi.mock('../ChatInterface', () => ({
   ),
 }));
 
-vi.mock('../EditRatingControl', () => ({
-  default: ({ initialRating, onSave, children }) => (
-    <div data-testid="edit-rating-control">
-      {children}
-      <div data-testid="mock-rating-display">Rating: {initialRating}</div>
-      <button onClick={() => onSave(3)}>Update Rating</button>
-    </div>
-  ),
-}));
-
 // Mock Lucide icons
 vi.mock('lucide-react', () => ({
   ArrowLeft: () => <span>ArrowLeft</span>,
-  Star: () => <span>Star</span>,
+  Star: () => <span data-testid="star-icon">Star</span>,
   BookOpen: () => <span>BookOpen</span>,
   ExternalLink: () => <span>ExternalLink</span>,
   RefreshCw: () => <span>RefreshCw</span>,
@@ -62,37 +52,47 @@ describe('Session', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders EditRatingControl when result is available', async () => {
+  it('renders star rating controls when result is available', async () => {
     render(<Session onExit={() => {}} />);
     
     // Complete the chat to show results
     fireEvent.click(screen.getByText('Complete Chat'));
 
     await waitFor(() => {
-        expect(screen.getByTestId('edit-rating-control')).toBeInTheDocument();
-        expect(screen.getByText('Rating: 2')).toBeInTheDocument();
+        const stars = screen.getAllByTestId('star-icon');
+        expect(stars).toHaveLength(3);
+        expect(screen.getByText('Нажмите для изменения оценки')).toBeInTheDocument();
+        // Initial rating is 2 ("Хорошо")
+        expect(screen.getByText('Хорошо')).toBeInTheDocument();
     });
   });
 
-  it('updates rating display when EditRatingControl saves', async () => {
+  it('updates rating when clicking a star', async () => {
     render(<Session onExit={() => {}} />);
     
     // Complete the chat to show results
     fireEvent.click(screen.getByText('Complete Chat'));
 
     await waitFor(() => {
-        expect(screen.getByText('Rating: 2')).toBeInTheDocument();
+        expect(screen.getByText('Хорошо')).toBeInTheDocument();
     });
 
-    // Update rating
-    fireEvent.click(screen.getByText('Update Rating'));
+    // Update rating to 3 by clicking the 3rd star
+    // The stars are rendered in a loop 1, 2, 3. 
+    // The buttons wrap the stars.
+    const stars = screen.getAllByTestId('star-icon');
+    const thirdStar = stars[2];
+    const button = thirdStar.closest('button');
+    
+    if (!button) throw new Error('Star button not found');
+    
+    fireEvent.click(button);
 
     await waitFor(() => {
-        // Since we are mocking EditRatingControl, we check if the prop passed to it would update
-        expect(screen.getByText('Rating: 3')).toBeInTheDocument();
+        expect(screen.getByText('Отлично')).toBeInTheDocument();
     });
     
     expect(storageService.updateLastRating).toHaveBeenCalledWith(1, 3);
-    expect(screen.getByText(/изменено/i)).toBeInTheDocument();
+    expect(screen.getByText(/изменено вручную/i)).toBeInTheDocument();
   });
 });

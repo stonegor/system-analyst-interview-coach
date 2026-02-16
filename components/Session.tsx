@@ -4,7 +4,6 @@ import { getSmartQueue, saveProgress, skipQuestion, updateLastRating } from '../
 import { Question, EvaluationResult } from '../types';
 import { ChatInterface } from './ChatInterface';
 import ReactMarkdown from 'react-markdown';
-import EditRatingControl from './EditRatingControl';
 
 interface Props {
   onExit: () => void;
@@ -15,6 +14,7 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
   const [queue, setQueue] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [result, setResult] = useState<EvaluationResult | null>(null);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
 
   const [hasBeenEdited, setHasBeenEdited] = useState(false);
 
@@ -44,6 +44,7 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
   const nextQuestion = () => {
     setResult(null);
     setHasBeenEdited(false);
+    setHoverRating(null);
     if (!isLastQuestion) {
         setCurrentIndex(prev => prev + 1);
     } else {
@@ -101,24 +102,41 @@ export const Session: React.FC<Props> = ({ onExit, initialQuestion }) => {
         {/* Evaluation Result View */}
         {result ? (
             <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <EditRatingControl initialRating={result.score} onSave={handleRatingUpdate}>
-                    <div className={`p-4 rounded-xl border mb-4 ${
-                        result.score === 3 ? 'bg-green-50 border-green-200' :
-                        result.score === 2 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'
-                    }`}>
-                        <div className="flex items-center gap-2 mb-2">
-                            <Star className={`w-5 h-5 ${result.score >= 1 ? 'fill-current' : 'opacity-30'}`} />
-                            <Star className={`w-5 h-5 ${result.score >= 2 ? 'fill-current' : 'opacity-30'}`} />
-                            <Star className={`w-5 h-5 ${result.score >= 3 ? 'fill-current' : 'opacity-30'}`} />
-                            <div className="ml-auto flex flex-col items-end">
-                                <span className="font-bold text-lg">
-                                    {result.score === 3 ? 'Отлично' : result.score === 2 ? 'Хорошо' : 'Надо учить'}
-                                </span>
-                                {hasBeenEdited && <span className="text-[10px] text-slate-400 font-normal">изменено</span>}
-                            </div>
-                        </div>
+                <div className="flex flex-col items-center justify-center py-6">
+                    <div className="flex flex-col items-center gap-1">
+                         <div className="flex gap-2">
+                            {[1, 2, 3].map((star) => (
+                                <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => handleRatingUpdate(star)}
+                                    onMouseEnter={() => setHoverRating(star)}
+                                    onMouseLeave={() => setHoverRating(null)}
+                                    className="focus:outline-none transition-transform hover:scale-110 p-1"
+                                >
+                                    <Star
+                                        className={`w-8 h-8 transition-colors ${
+                                            (hoverRating !== null ? star <= hoverRating : star <= result.score)
+                                                ? 'fill-yellow-400 text-yellow-400'
+                                                : 'text-slate-300'
+                                        }`}
+                                    />
+                                </button>
+                            ))}
+                         </div>
+                         <span className="text-[10px] text-slate-400">Нажмите для изменения оценки</span>
                     </div>
-                </EditRatingControl>
+
+                    <div className="flex flex-col items-center mt-2">
+                         <span className={`font-bold text-lg ${
+                            result.score === 3 ? 'text-green-600' : 
+                            result.score === 2 ? 'text-yellow-600' : 'text-red-600'
+                         }`}>
+                            {result.score === 3 ? 'Отлично' : result.score === 2 ? 'Хорошо' : 'Надо учить'}
+                        </span>
+                        {hasBeenEdited && <span className="text-[10px] text-slate-400 font-normal mt-1">изменено вручную</span>}
+                    </div>
+                </div>
 
                 <div className="prose prose-sm mb-6">
 

@@ -24,14 +24,14 @@
     - [ ] Call `storageService.updateSessionRating` with the new value.
     - [ ] Update local component state to reflect the change immediately.
     - [ ] Trigger a refresh of the dashboard/stats data if needed.
-- [~] Task: Conductor - User Manual Verification 'State Management & Data Persistence' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'State Management & Data Persistence' (Protocol in workflow.md) [checkpoint: 6e6ba54]
 
 ## Phase 3: Verification & Polish
-- [ ] Task: Verify Statistics Update
+- [x] Task: Verify Statistics Update [074f039]
     - [ ] Manually change a rating for a past session.
     - [ ] Navigate to the Dashboard.
     - [ ] Verify that the overall mastery/progress score reflects the new manual rating.
-- [ ] Task: UI Polish
+- [x] Task: UI Polish [a7b9052]
     - [ ] Ensure the "Edit" icon is subtle but accessible.
     - [ ] Add a tooltip or visual indicator that a rating has been manually edited (optional, but good UX).
-- [ ] Task: Conductor - User Manual Verification 'Verification & Polish' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Verification & Polish' (Protocol in workflow.md)

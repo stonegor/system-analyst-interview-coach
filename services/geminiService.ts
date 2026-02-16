@@ -5,7 +5,7 @@ import { SYSTEM_INSTRUCTION } from "../constants";
 const getAI = () => {
   const options: any = { apiKey: process.env.API_KEY };
   if (process.env.GEMINI_BASE_URL) {
-    options.baseUrl = process.env.GEMINI_BASE_URL;
+    options.httpOptions = { baseUrl: process.env.GEMINI_BASE_URL };
   }
   return new GoogleGenAI(options);
 };
