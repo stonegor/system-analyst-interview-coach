@@ -2,7 +2,13 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { ChatMessage, EvaluationResult, Question } from "../types";
 import { SYSTEM_INSTRUCTION } from "../constants";
 
-const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
+const getAI = () => {
+  const options: any = { apiKey: process.env.API_KEY };
+  if (process.env.GEMINI_BASE_URL) {
+    options.baseUrl = process.env.GEMINI_BASE_URL;
+  }
+  return new GoogleGenAI(options);
+};
 
 export const sendChatMessage = async (
   history: ChatMessage[],
