@@ -31,7 +31,7 @@ Goal: Create the user interface for inputting API keys and managing data export/
     - [ ] Ensure the service throws a clear error if the key is missing or invalid, prompting the UI to show the settings modal.
 - [ ] Task: Conductor - User Manual Verification 'Settings & API Key Management UI' (Protocol in workflow.md)
 
-## Phase 3: GitHub Pages Deployment
+## Phase 3: GitHub Pages Deployment [checkpoint: 5d7ee48]
 Goal: Configure the project for hosting on GitHub Pages.
 
 - [x] Task: Update Vite Configuration f55bb06
@@ -46,7 +46,7 @@ Goal: Configure the project for hosting on GitHub Pages.
 ## Phase 4: Final Verification
 Goal: Comprehensive testing of the new features.
 
-- [ ] Task: Manual Verification - Fresh Load
+- [~] Task: Manual Verification - Fresh Load
     - [ ] Clear browser storage.
     - [ ] Verify app prompts for API Key.
     - [ ] Enter key and verify it persists (or doesn't, based on "Remember Me").

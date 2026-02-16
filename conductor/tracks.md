@@ -14,5 +14,5 @@ This file tracks all feature, bug fix, and chore tracks for the project.
 
 ---
 
-- [ ] **Track: Local Persistence, Data Export/Import, and BYO-Key Deployment**
+- [~] **Track: Local Persistence, Data Export/Import, and BYO-Key Deployment**
 *Link: [./tracks/local_persistence_gh_pages_20260217/](./tracks/local_persistence_gh_pages_20260217/)*
