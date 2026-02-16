@@ -60,4 +60,32 @@ describe('StorageContext', () => {
     expect(localStorageService.savePreferences).toHaveBeenCalledWith({ apiKey: 'new-key' });
     expect(await screen.findByText('API Key: new-key')).toBeInTheDocument();
   });
+
+  it('should save to session storage when remember is false', async () => {
+    (localStorageService.loadPreferences as any).mockReturnValue(null);
+    
+    // Mock sessionStorage
+    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
+    const removeItemSpy = vi.spyOn(Storage.prototype, 'removeItem');
+
+    const TestComponentWithToggle = () => {
+      const { savePreferences } = useStorage();
+      return <button onClick={() => savePreferences({ apiKey: 'session-key' }, false)}>Save Session</button>;
+    };
+
+    render(
+      <StorageProvider>
+        <TestComponentWithToggle />
+      </StorageProvider>
+    );
+
+    const button = screen.getByText('Save Session');
+    act(() => {
+        button.click();
+    });
+
+    expect(setItemSpy).toHaveBeenCalledWith('saic_preferences', JSON.stringify({ apiKey: 'session-key' }));
+    // Verify local storage was cleared
+    expect(removeItemSpy).toHaveBeenCalledWith('saic_preferences');
+  });
 });
