@@ -124,16 +124,14 @@ describe('geminiService', () => {
       expect(createCallArgs.history[1].role).toBe('user');
     });
 
-    it('should handle API errors gracefully', async () => {
-        (localStorageService.loadPreferences as any).mockReturnValue({ apiKey: 'key' });
-        const history: ChatMessage[] = [];
-        const reviewContext = { question: 'q', feedback: 'f', score: 1 };
-        
-        mockSendMessage.mockRejectedValue(new Error('API Error'));
+    it('should propagate API errors', async () => {
+    (localStorageService.loadPreferences as any).mockReturnValue({ apiKey: 'key' });
+    const history: ChatMessage[] = [];
+    const reviewContext = { question: 'q', feedback: 'f', score: 1 };
+    
+    mockSendMessage.mockRejectedValue(new Error('API Error'));
 
-        const response = await sendCoachMessage(history, 'test', reviewContext);
-        
-        expect(response).toBe('Извините, произошла ошибка при генерации ответа.');
-    });
+    await expect(sendCoachMessage(history, 'test', reviewContext)).rejects.toThrow('API Error');
+  });
   });
 });

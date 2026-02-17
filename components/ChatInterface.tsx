@@ -98,9 +98,10 @@ export const ChatInterface: React.FC<Props> = ({ question, onComplete, onSkip, i
       setMessages(prev => [...prev, botMsg]);
     } catch (error: any) {
       console.error(error);
-      const errorMessage = error.message && error.message.includes('API Key') 
-        ? error.message 
-        : 'Ошибка сети. Попробуйте еще раз.';
+      let errorMessage = error.message || 'Произошла неизвестная ошибка.';
+      if (error.status) {
+        errorMessage += ` (Status: ${error.status})`;
+      }
       setMessages(prev => [...prev, { id: 'err', role: 'system', text: errorMessage }]);
     } finally {
       setIsTyping(false);
@@ -112,10 +113,14 @@ export const ChatInterface: React.FC<Props> = ({ question, onComplete, onSkip, i
     try {
       const result = await evaluateSession(question, messages);
       onComplete(result);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      let errorMessage = e.message || 'Unknown error';
+      if (e.status) {
+        errorMessage += ` (Status: ${e.status})`;
+      }
       // Fallback
-      onComplete({ score: 1, feedback: "Error evaluating", correctAnswer: question.answer });
+      onComplete({ score: 1, feedback: `Error evaluating: ${errorMessage}`, correctAnswer: question.answer });
     } finally {
       setIsEvaluating(false);
     }

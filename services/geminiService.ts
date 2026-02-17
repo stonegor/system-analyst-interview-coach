@@ -98,13 +98,8 @@ export const sendCoachMessage = async (
     history: historyParts
   });
 
-  try {
-    const result = await chat.sendMessage({ message: newMessage });
-    return result.text || "Извините, произошла ошибка при генерации ответа.";
-  } catch (error) {
-    console.error("Coach message error:", error);
-    return "Извините, произошла ошибка при генерации ответа.";
-  }
+  const result = await chat.sendMessage({ message: newMessage });
+  return result.text || "Извините, произошла ошибка при генерации ответа.";
 };
 
 export const evaluateSession = async (
