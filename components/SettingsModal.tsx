@@ -175,7 +175,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <div className="space-y-2">
                 <h3 className="text-sm font-medium text-slate-900">Export Progress</h3>
                 <p className="text-xs text-slate-500">Save your progress to a file or clipboard.</p>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={handleDownload}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition-all text-sm"
@@ -183,6 +183,42 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                     <Download size={16} />
                     Download JSON
                   </button>
+                  <button
+                    onClick={() => document.getElementById('json-upload-input')?.click()}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition-all text-sm"
+                  >
+                    <Upload size={16} />
+                    Upload JSON file
+                  </button>
+                  <input 
+                    type="file" 
+                    id="json-upload-input"
+                    data-testid="json-upload-input"
+                    accept=".json"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const content = event.target?.result as string;
+                        if (window.confirm('This will overwrite your current progress. Are you sure you want to proceed?')) {
+                          const success = importData(content);
+                          if (success) {
+                            setImportStatus('success');
+                            setTimeout(() => {
+                              setImportStatus('idle');
+                              window.location.reload();
+                            }, 1500);
+                          } else {
+                            setImportStatus('error');
+                          }
+                        }
+                      };
+                      reader.readAsText(file);
+                      e.target.value = ''; // Reset input
+                    }}
+                  />
                   <button
                     onClick={handleCopy}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition-all text-sm"

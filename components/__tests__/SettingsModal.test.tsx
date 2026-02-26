@@ -113,4 +113,78 @@ describe('SettingsModal', () => {
         expect(window.location.reload).toHaveBeenCalled();
     }, { timeout: 2000 });
   });
+
+  it('handles file upload and import with confirmation', async () => {
+    mockImportData.mockReturnValue(true);
+    Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: { reload: vi.fn() },
+    });
+    
+    // Mock window.confirm
+    window.confirm = vi.fn();
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => true);
+
+    render(<SettingsModal isOpen={true} onClose={onClose} />);
+    
+    const dataTab = screen.getByRole('button', { name: /data/i });
+    fireEvent.click(dataTab);
+    
+    // Find the file input
+    // The input should be hidden, but we can query it by its label or role, or just test id if we add one.
+    // Let's assume we add a data-testid to it.
+    // Wait, testing-library prefers finding by label. Let's assume there's a label "Upload JSON file" or a test id.
+    // We will query by data-testid "file-upload-input" to be safe.
+    // Actually, since it's a file input, we can get it by `document.querySelector('input[type="file"]')` if we have to,
+    // but better to add data-testid="json-upload-input" in the implementation.
+    
+    // We expect the button "Upload JSON file" to be present.
+    const uploadButton = screen.getByRole('button', { name: /upload json file/i });
+    expect(uploadButton).toBeInTheDocument();
+    
+    // In our implementation, clicking the button will trigger the input. We'll simulate changing the input directly.
+    // The test runner might not be able to easily test the `button.click()` triggering `input.click()`, so we test the input directly.
+    const file = new File(['{"progress": {"1": {"status": "done"}}}'], 'data.json', { type: 'application/json' });
+    
+    // We need the input element
+    const fileInput = screen.getByTestId('json-upload-input');
+    
+    fireEvent.change(fileInput, { target: { files: [file] } });
+    
+    // FileReader is asynchronous
+    await waitFor(() => {
+        expect(confirmSpy).toHaveBeenCalledWith(expect.stringMatching(/overwrite/i));
+    });
+    
+    expect(mockImportData).toHaveBeenCalledWith('{"progress": {"1": {"status": "done"}}}');
+    
+    await waitFor(() => {
+        expect(window.location.reload).toHaveBeenCalled();
+    }, { timeout: 2000 });
+
+    confirmSpy.mockRestore();
+  });
+
+  it('aborts file upload if confirmation is cancelled', async () => {
+    // Mock window.confirm to return false
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => false);
+
+    render(<SettingsModal isOpen={true} onClose={onClose} />);
+    
+    const dataTab = screen.getByRole('button', { name: /data/i });
+    fireEvent.click(dataTab);
+    
+    const file = new File(['{"progress": {"1": {"status": "done"}}}'], 'data.json', { type: 'application/json' });
+    const fileInput = screen.getByTestId('json-upload-input');
+    
+    fireEvent.change(fileInput, { target: { files: [file] } });
+    
+    await waitFor(() => {
+        expect(confirmSpy).toHaveBeenCalled();
+    });
+    
+    expect(mockImportData).not.toHaveBeenCalled();
+    
+    confirmSpy.mockRestore();
+  });
 });
