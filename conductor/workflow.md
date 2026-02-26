@@ -331,3 +331,6 @@ A task is complete when:
 - Document lessons learned
 - Optimize for user happiness
 - Keep things simple and maintainable
+
+## New track planning workflow
+- EXAMINE THE STATE OF THE APP TO SKIP CLARIFYING QUESTIONS THAT CAN BE ANSWERED BY JUST LOOKING AT THE CODE.

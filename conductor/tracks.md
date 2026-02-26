@@ -19,5 +19,5 @@ This file tracks all feature, bug fix, and chore tracks for the project.
 
 ---
 
-- [ ] **Track: Add json import in addition to export in this app.**
+- [~] **Track: Add json import in addition to export in this app.**
 *Link: [./tracks/json_import_20260226/](./tracks/json_import_20260226/)*
