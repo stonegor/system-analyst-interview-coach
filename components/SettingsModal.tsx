@@ -175,7 +175,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <div className="space-y-2">
                 <h3 className="text-sm font-medium text-slate-900">Export Progress</h3>
                 <p className="text-xs text-slate-500">Save your progress to a file or clipboard.</p>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-2">
                   <button
                     onClick={handleDownload}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition-all text-sm"
@@ -184,10 +184,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                     Download JSON
                   </button>
                   <button
-                    onClick={() => document.getElementById('json-upload-input')?.click()}
+                    onClick={handleCopy}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition-all text-sm"
                   >
-                    <Upload size={16} />
+                    {copySuccess ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
+                    {copySuccess ? 'Copied!' : 'Copy to Clipboard'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="h-px bg-slate-200" />
+
+              {/* Import */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-medium text-slate-900">Import Progress</h3>
+                  <button
+                    onClick={() => document.getElementById('json-upload-input')?.click()}
+                    className="flex items-center gap-2 px-3 py-1.5 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition-all text-xs font-medium"
+                  >
+                    <Upload size={14} />
                     Upload JSON file
                   </button>
                   <input 
@@ -219,22 +235,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       e.target.value = ''; // Reset input
                     }}
                   />
-                  <button
-                    onClick={handleCopy}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition-all text-sm"
-                  >
-                    {copySuccess ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
-                    {copySuccess ? 'Copied!' : 'Copy to Clipboard'}
-                  </button>
                 </div>
-              </div>
-
-              <div className="h-px bg-slate-200" />
-
-              {/* Import */}
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-slate-900">Import Progress</h3>
-                <p className="text-xs text-slate-500">Paste your JSON data below to restore progress.</p>
+                <p className="text-xs text-slate-500">Upload a file or paste your JSON data below.</p>
                 <textarea
                   value={importJson}
                   onChange={(e) => setImportJson(e.target.value)}
