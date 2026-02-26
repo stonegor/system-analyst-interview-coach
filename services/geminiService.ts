@@ -12,7 +12,7 @@ const getAI = () => {
   if (!apiKey) {
     apiKey = process.env.VITE_GEMINI_API_KEY || process.env.API_KEY;
   }
-  
+
   if (!baseUrl) {
     baseUrl = process.env.GEMINI_BASE_URL;
   }
@@ -71,21 +71,19 @@ export const sendCoachMessage = async (
   }));
 
   const coachInstruction = `
-    You are a helpful and supportive System Analyst Interview Coach.
+    You are a helpful System Analyst Interview Coach.
     The formal interview session has ended. Your role now is to help the user understand their performance and learn from their mistakes.
     
     Context:
     - The user was asked: "${reviewContext.question}"
-    - They received a score of: ${reviewContext.score}/3
     - The feedback provided was: "${reviewContext.feedback}"
     
     Guidelines:
     - Answer the user's questions clearly and concisely.
     - Explain concepts if they are confused.
     - Reference the specific feedback given if relevant.
-    - Maintain a positive, encouraging tone.
     - Do NOT continue the roleplay as an interviewer. Be a mentor/teacher now.
-    - If the user asks about the score, explain why they received it based on the feedback, but remind them the score is final for this session.
+    - Never use analogies in the explanations.
     - Respond in Russian.
   `;
 
@@ -111,7 +109,7 @@ export const evaluateSession = async (
   // Contextualize the evaluation
   const prompt = `
     Analyze the following conversation where I (the User) was tested on the question: "${question.question}".
-    The correct/expected answer essence is: "${question.answer}".
+    The expected answer essence/summary is: "${question.answer}".
 
     Conversation Transcript:
     ${conversationHistory.map(m => `${m.role.toUpperCase()}: ${m.text}`).join('\n')}
@@ -120,6 +118,8 @@ export const evaluateSession = async (
     1. Rate my understanding (1 = Poor/Wrong, 2 = Okay/Incomplete, 3 = Excellent/Correct).
     2. Provide constructive feedback in Russian.
     3. State the correct answer clearly.
+    4. If I've used any terms imprecisely, please correct me, but it shouldn't heavily influence the ranking.
+    5. Answer the last question, if left unanswered.
 
     Return JSON.
   `;
