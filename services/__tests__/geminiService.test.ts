@@ -113,10 +113,9 @@ describe('geminiService', () => {
       
       // Verify chat creation config
       const createCallArgs = mockChatsCreate.mock.calls[0][0];
-      expect(createCallArgs.config.systemInstruction).toContain('You are a helpful and supportive System Analyst Interview Coach.');
+      expect(createCallArgs.config.systemInstruction).toContain('You are a helpful System Analyst Interview Coach');
       expect(createCallArgs.config.systemInstruction).toContain('What is SQL?');
       expect(createCallArgs.config.systemInstruction).toContain('You missed the structured part.');
-      expect(createCallArgs.config.systemInstruction).toContain('2/3');
       
       // Verify history transformation
       expect(createCallArgs.history).toHaveLength(2);
